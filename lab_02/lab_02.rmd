@@ -73,10 +73,4 @@ df <-
 
 **Q6.** Choose your own adventure: using either the UMD courses or campaign expenses data, ask and answer a question that is different than the previous ones. You can use one of the ones you provided in the pre_lab. **A6.** You could use mutate to create a column of Maryland courses that separates them not by department or title, but by advanced or undergraduate courses? Some sort of function incorporating the section numbers, perhaps. "Command not found"
 
-```{r} maryland_courses <- maryland_courses %>%}
-  mutate(
-    course_level = case_when(
-      as.numeric(substr(sections, 1, 1)) >= 5 ~ "Advanced",
-      as.numeric(substr(sections, 1, 1)) < 5 ~ "Undergraduate",
-      TRUE ~ NA_character_
-```
+`{r} maryland_courses <- maryland_courses %>%}   mutate(     course_level = case_when(       as.numeric(substr(sections, 1, 1)) >= 5 ~ "Advanced",       as.numeric(substr(sections, 1, 1)) < 5 ~ "Undergraduate",       TRUE ~ NA_character_`
