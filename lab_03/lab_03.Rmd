@@ -29,10 +29,21 @@ Load the two datasets we worked with in the pre_lab that are in the data folder:
 
 ```{r}
 # Load in the Maryland state agency payments data, making sure that it correctly sets the datatypes using all of the rows
-payments <- read_csv("data/State_of_Maryland_Grant_and_Loan_Data__FY2009_to_FY2022.csv", guess_max=19482)
-
-# Load in the Maryland grants and loan data
+md_payments <- read_csv
+("data/State_of_Maryland_Grant_and_Loan_Data__FY2009_to_FY2022.csv", 
+  guess_max=19482
+  ) |>
+  clean_names()
 ```
+
+```{r}
+
+md_payments_good_names |> 
+  group_by(vendor_name) |>
+  summarize(count = n())
+```
+
+`{# Load in the Maryland grants and loan data}`
 
 ## Answer questions
 
@@ -72,6 +83,13 @@ cleaned_ <- State_of_Maryland_Grant_and_Loan_Data_FY2009_to_FY2022 |>
    
    # Save dataframe 'my_df' as a CSV file
    write.csv(my_df, "my_data.csv", row.names = FALSE)
+   
+   
+   
+#What prof wrote
+   # Narrow the search using the variations identified above
+   pg_schools <- md_payments |>
+     filter()
 ```
 
 ```{r}
