@@ -16,9 +16,9 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Introduction 
+## Introduction
 
-In this notebook, we are reverse engineering the story, [STORY NAME](STORY URL)
+In this notebook, we are reverse engineering the story, *CEOs gave heavily during legislative session, exposing loophole in NC's fundraising ban (WRAL, North Carolina*
 
 ## Load libraries
 
@@ -26,11 +26,18 @@ Loading required libraries for this analysis.
 
 ```{r echo=FALSE, message=FALSE}
 
+library(tidyverse)
+library(lubridate)
+library(refinr)
+library(janitor)
+library(stringr)
+library(readxl)
+
 ```
 
 ## Load and Cleaning Data
 
-In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data. 
+In this section, describe the source of the data, write a basic data dictionary for data you are working with, and discuss any caveats or issues you discovered working with this data.
 
 ```{r}
 # Load required data
@@ -39,28 +46,40 @@ In this section, describe the source of the data, write a basic data dictionary 
 
 # Clean required data and prepare for analysis if needed. 
 
+nc_finance_data <- read_excel("donors0103_0701")
 
 ```
 
 ## Sentences to Engineer
+
 In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 1
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+- **Sentence text**: *The co-chief executives at a Georgia firm that brokers tax credits put \$41,000 into the campaign accounts of North Carolina General Assembly members during the last regular legislative session.*
+- **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?] Strobel and Delmer, the two primary executives at Monarch Capital, gave a total of about \$41,000
 
 ```{r}
 # Put code to reverse engineer sentence here
 
 # Display results of code below this codeblock
 
+nc_finance_data_session <- nc_finance_data |>
+  filter(between(date, as.Date(2018-05-16), as.Date("2018-06-29")))
+
+nc_finance_data_session |>
+  filter((name_clean == "GEORGE LEWIS STROBEL II" | name_clean == "ROBIN E DELMER") & source == "candidates") |>
+  group_by(name_clean) |>
+  summarise(
+    total = sum(amount)
+  )
+
 ```
 
 ### Sentence 2
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+- **Sentence text**: *This year's legislative session also saw significant donations from hog farmers and beer distributors, both industries with important legislation before the General Assembly. Senate President Pro Tem Phil Berger's campaign alone raised nearly \$222,000 during session. Twenty-three people gave him the maximum allowed: \$5,200*
+- **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
 ```{r}
 # Put code to reverse engineer sentence here
@@ -71,8 +90,8 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 3
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+- **Sentence text**: *Add in donations to the two main political parties and to a handful of other large fundraising vehicles for state legislative races, and the in-session giving topped \$3.4 million. Gov. Roy Cooper's main campaign account brought in another \$407,000 during session*
+- **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
 ```{r}
 # Put code to reverse engineer sentence here
@@ -83,8 +102,8 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 4
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+- **Sentence text**: *A WRAL News analysis of campaign finance filings also turned up \$16,000 in donations to legislative campaigns during session from 15 PACs with a lobbyist. Each would appear to be a violation of state fundraising rules, but spokespeople for most of the PACs, or the companies they represent, said there was a simple explanation: The checks were written before session.*
+- **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
 ```{r}
 # Put code to reverse engineer sentence here
@@ -95,8 +114,8 @@ In this notebook, we are reverse engineering five sentences from the story.
 
 ### Sentence 5
 
-* **Sentence text**: [Paste in sentence to engineer here]
-* **Analysis summary**: [Write up two to three sentences describing the results of your analysis.  Were you able to confirm the finding? If not, why not?]
+- **Sentence text**: *Despite loopholes, it's clear the partial session ban depresses fundraising. Giving peaks right before session, then falls off a cliff.*
+- **Analysis summary**: [Write up two to three sentences describing the results of your analysis. Were you able to confirm the finding? If not, why not?]
 
 ```{r}
 # Put code to reverse engineer sentence here
