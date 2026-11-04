@@ -32,7 +32,7 @@ The dataset we'll use is 911 overdose calls from Baltimore County in 2022. Let's
 
 ### Task 2: Load data
 
-**Task** Run the following code to load the data. In the space below, indicate how many rows and columns it has. **Answer**
+**Task** Run the following code to load the data. In the space below, indicate how many rows and columns it has. **Answer: 3822 rows, 4 columns**
 
 ```{r}
 baltco_911_calls <- read_csv("data/baltco_911_calls.csv")
@@ -52,7 +52,7 @@ First, we'll add a month column to our dataframe using lubridate.
 
 ### Task 3: Add a month column to our 911 calls dataframe using lubridate and calculate the number of calls for each month
 
-**Task** Run the following code to add a month column to our dataframe using lubridate and count the number of calls for each month. In the space below, explain what each step of the code below is doing in English. Note the "label=TRUE" part in the mutate statement. **Answer**
+**Task** Run the following code to add a month column to our dataframe using lubridate and count the number of calls for each month. In the space below, explain what each step of the code below is doing in English. Note the "label=TRUE" part in the mutate statement. **Answer: 1st line summons the data; 2nd line modifies the columns and makes it text instead numbers; 3rd line groups by month column; 4th summarizes by call volume; 5th arranges the column in descending order**
 
 ```{r}
 baltco_911_calls_by_month <- baltco_911_calls |>
