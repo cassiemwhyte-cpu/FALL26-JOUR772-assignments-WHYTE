@@ -21,6 +21,19 @@ knitr::opts_chunk$set(echo = TRUE)
 
 You will need to create columns for the date, week and month based on the existing `datetime` column.
 
+```{r}
+
+library(dplyr)
+library(lubridate)
+
+df <- df |>
+  mutate(
+    date = as.Date(datetime),
+    week = isoweek(datetime),
+    month = month(datetime)
+  )
+```
+
 ## Questions
 
 **Q1.** Which month saw the greatest percentage of total calls? Create a dataframe that calculates the percentage of all calls that each month's calls represents. Make a bar chart from that dataframe. Your bar chart must have:
@@ -31,16 +44,39 @@ You will need to create columns for the date, week and month based on the existi
 
 Compare the results here to those from the pre_lab_08 bar chart - are there major differences in the months with the highest and lowest figures? Describe that below.
 
-**A1.**
+**A1. December, November, and July are the highest**
 
 ```{r}
 
-library(tidyverse)
+
+library(dplyr)
+library(ggplot2)
 library(lubridate)
 
-prince_georges_2022_overdoses_by_datetime <- prince_georges_2022_overdoses |>
-  mutate(datetime = datetime(date, label=TRUE)) |>
-  
+monthly_calls <- prince_georges_2022_overdoses |>
+  group_by(month) |>
+  summarise(total_calls = n()) |>
+  mutate(
+    percentage = (total_calls / sum(total_calls)) * 100
+  ) |>
+  arrange(match(month, month.name))
+```
+
+```{r}
+
+library(ggplot2)
+library(dplyr)
+
+prince_georges_2022_overdoses |>
+  count(month) |>
+  ggplot(aes(x = month, y = n)) +
+  geom_col(fill = "steelblue") +
+  labs(
+    title = "Overdoses by Month in Prince George's County (2022)",
+    x = "Month",
+    y = "Number of Overdoses"
+  ) +
+  theme_minimal()
 ```
 
 **Q2.** Let's visualize this data on a weekly basis using a line chart. As in Q1, generate a dataframe with the total number of calls for each week, and then create a line chart to show the distribution of calls over time. Your line chart must have:
@@ -51,9 +87,49 @@ prince_georges_2022_overdoses_by_datetime <- prince_georges_2022_overdoses |>
 
 Describe the pattern of results; you may want to look at the data to dig into particular outliers.
 
-**A2.**
+**A2. July looks way higher**
 
 ```{r}
+
+library(dplyr)
+library(lubridate)
+
+weekly_calls <- prince_georges_2022_overdoses |>
+  mutate(
+    datetime = as.POSIXct(datetime, format = "%Y-%m-%d %H:%M:%S"),
+    week_start = floor_date(datetime, unit = "week", week_start = 1)
+  ) |>
+  group_by(week_start) |>
+  summarise(
+    total_calls = n(),
+    .groups = "drop"
+  ) |>
+  arrange(week_start)
+```
+
+```{r}
+
+library(ggplot2)
+
+ggplot(weekly_calls, aes(x = week_start, y = total_calls)) +
+  geom_line(color = "steelblue", linewidth = 1) +
+  geom_point(color = "darkred", size = 1.8) +
+  labs(
+    title = "Weekly EMS Overdose Calls in Prince George's County (2022)",
+    x = "Week",
+    y = "Total Number of Overdose Calls",
+    caption = "Source: Prince George's County EMS"
+  ) +
+  scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.caption = element_text(hjust = 0)
+  )
 ```
 
 **Q3.** A scatterplot is a type of chart that helps us see relationships between two variables. One variable goes on the x axis, the other on the y axis. For each row/observation in our data, a scatterplot puts a circle (or a "point") where the two variables intersect on a grid.
@@ -78,7 +154,68 @@ To answer this question, do the following:
 6.  Add a label for each point that shows the zip code using geom_text() - see some examples of its use at <https://ggplot2.tidyverse.org/reference/geom_text.html#ref-examples>. Try to make the names as easy to read as possible by avoiding overlap.
 7.  In the answer space below, describe what you see and answer the questions posed above. In a general sense, what do you think this means? Feel free to consider the actual raw values: how would you report out the main point(s) of this chart?
 
-**A3.**
+**A3. I don't know if we can extrapolate too much from this. It seems to just say that the zips with higher populations have higher number of calls, but its not clear to me that it depends too much on income actually? Am I missing something?**
 
 ```{r}
+
+library(dplyr)
+library(stringr)
+
+zip_calls <- prince_georges_2022_overdoses |>
+  mutate(
+    zip_code = str_pad(as.character(zipcode), width = 5, pad = "0")
+  ) |>
+  filter(!is.na(zipcode), zipcode != "") |>
+  group_by(zip_code) |>
+  summarise(
+    total_calls = n(),
+    .groups = "drop"
+  )
+
+head(zip_calls)
+```
+
+```{r}
+
+install.packages("tidycensus")
+install.packages("ggrepel")
+
+library(tidycensus)
+library(dplyr)
+library(ggplot2)
+library(ggrepel)
+library(scales)
+```
+
+```{r}
+
+income_data <- get_acs(
+  geography = "zcta",
+  variables = "B19013_001",
+  year = 2022,
+  survey = "acs5"
+) |>
+  select(
+    zip_code = GEOID,
+    median_income = estimate
+  )
+
+head(income_data)
+```
+
+```{r}
+
+
+overdose_income <- zip_calls |>
+  left_join(income_data, by = "zip_code")
+```
+
+```{r}
+
+head(overdose_income)
+```
+
+```{r}
+
+sum(is.na(overdose_income$median_income))
 ```
